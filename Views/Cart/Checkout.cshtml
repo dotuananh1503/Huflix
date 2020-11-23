@@ -1,0 +1,137 @@
+﻿
+@{
+    ViewData["Title"] = "Confirm";
+}
+@section Carousel{
+    <div class="slider movie-items">
+        <div class="container">
+            <div class="row">
+
+            </div>
+        </div>
+    </div>
+}
+
+<h1>Checkout</h1>
+<hr />
+
+<form method="post" enctype="multipart/form-data" asp-controller="Cart" asp-action="Success">
+    <h2>Thông tin Khách Hàng</h2>
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Họ tên Khách Hàng:</label>
+        <div class="col-sm-6">
+            <input id="txtFullName" name="txtFullName" type="text" class="form-control" required>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Số điện thoại:</label>
+        <div class="col-sm-6">
+            <input id="txtPhone" name="txtPhone" type="text" class="form-control" required>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Địa chỉ giao hàng:</label>
+        <div class="col-sm-6">
+            <input id="txtAddress" name="txtAddress" type="text" class="form-control" required>
+        </div>
+    </div>
+    <hr />
+    <h2>Phương pháp thanh toán</h2>
+    <div class="row">
+        <div class="col-sm-6">
+            <select class="custom-select">
+                <option>Ngân hàng nội địa</option>
+                <option>Ví Momo</option>
+                <option>Ví Airpay</option>
+                <option>Thanh toán khi nhận hàng</option>
+            </select>
+        </div>
+    </div>
+
+    <hr />
+    <h2>Giỏ hàng</h2>
+    <table class="table-bordered table">
+        <tr>
+            <th>Name</th>
+            <th>Photo</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Sub Total</th>
+        </tr>
+        @foreach (var item in ViewBag.cart)
+        {
+            <tr>
+                <td>@item.Product.Name</td>
+                <td><img src="~/images/products/@item.Product.Image" width="60" height="60" /></td>
+                <td>@item.Product.Price</td>
+                <td>@item.Quantity</td>
+                <td>@(item.Product.Price * item.Quantity)</td>
+            </tr>
+        }
+        <tr>
+            <td align="right" colspan="5">Sum</td>
+            <td>
+                @ViewBag.total
+            </td>
+        </tr>
+    </table>
+    <hr />
+    <a asp-controller="Cart" asp-action="Success"><input type="submit" class="btn btn-success" value="Thanh toán"></a>
+
+    <div id="paypal-button-container"></div>
+
+    <script>
+        paypal.Buttons().render('#paypal-button-container');
+        // This function displays Smart Payment Buttons on your web page.
+    </script>
+
+    <div id="smart-button-container">
+        <div style="text-align: center;">
+            <div id="paypal-button-container"></div>
+        </div>
+    </div>
+    <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD" data-sdk-integration-source="button-factory"></script>
+    <script>
+        function initPayPalButton() {
+            paypal.Buttons({
+                style: {
+                    shape: 'pill',
+                    color: 'blue',
+                    layout: 'horizontal',
+                    label: 'paypal',
+
+                },
+
+                createOrder: function (data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{ "amount": { "currency_code": "USD", "value": 1 } }]
+                    });
+                },
+
+                onApprove: function (data, actions) {
+                    return actions.order.capture().then(function (details) {
+                        alert('Transaction completed by ' + details.payer.name.given_name + '!');
+                    });
+                },
+
+                onError: function (err) {
+                    console.log(err);
+                }
+            }).render('#paypal-button-container');
+        }
+        initPayPalButton();
+    </script>
+</form>
+
+
+
+
+<!DOCTYPE html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Ensures optimal rendering on mobile devices. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" /> <!-- Optimal Internet Explorer compatibility -->
+</head>
+
+
+
